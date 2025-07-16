@@ -62,27 +62,72 @@ function InputForm() {
         Bench: 135,
         'Weighted Pull-up': 45,
         Deadlift: 315,
+        'Overhead Press': 95,
+        'Front Squat': 185,
     });
     const [repSetInputs, setRepSetInputs] = useState({
         Squat_reps: 5,
         Bench_reps: 5,
         'Weighted Pull-up_reps': 5,
         Deadlift_reps: 5,
+        'Overhead Press_reps': 5,
+        'Front Squat_reps': 5,
     });
+    // Cluster options based on strength program
+    const getClusterOptions = () => {
+        switch (strengthProgram) {
+            case 'Operator':
+            case 'Fighter':
+            case 'FighterIA':
+                return [
+                    { value: 'Standard', label: 'Standard' },
+                    { value: 'Grunt', label: 'Grunt' },
+                ];
+            case 'Zulu':
+                return [
+                    { value: 'Standard', label: 'Standard' },
+                    { value: 'MinimalistA', label: 'Minimalist A' },
+                    { value: 'MinimalistB', label: 'Minimalist B' },
+                ];
+            default:
+                return [];
+        }
+    };
+
     const getLiftFields = () => {
         if (cluster === 'Standard') {
-            return [
-                { label: 'Squat', name: 'Squat' },
-                { label: 'Bench', name: 'Bench' },
-                { label: 'Weighted Pull-up', name: 'Weighted Pull-up' },
-                { label: 'Deadlift', name: 'Deadlift' },
-            ];
+            if (strengthProgram === 'Zulu') {
+                return [
+                    { label: 'Squat', name: 'Squat' },
+                    { label: 'Bench', name: 'Bench' },
+                    { label: 'Overhead Press', name: 'Overhead Press' },
+                    { label: 'Deadlift', name: 'Deadlift' },
+                ];
+            } else {
+                return [
+                    { label: 'Squat', name: 'Squat' },
+                    { label: 'Bench', name: 'Bench' },
+                    { label: 'Weighted Pull-up', name: 'Weighted Pull-up' },
+                    { label: 'Deadlift', name: 'Deadlift' },
+                ];
+            }
         } else if (cluster === 'Grunt') {
             return [
                 { label: 'Front Squat', name: 'Front Squat' },
                 { label: 'Overhead Press', name: 'Overhead Press' },
                 { label: 'Weighted Pull-up', name: 'Weighted Pull-up' },
                 { label: 'Deadlift', name: 'Deadlift' },
+            ];
+        } else if (cluster === 'MinimalistA') {
+            return [
+                { label: 'Bench', name: 'Bench' },
+                { label: 'Deadlift', name: 'Deadlift' }
+            ];
+        } else if (cluster === 'MinimalistB') {
+            return [
+                { label: 'Bench', name: 'Bench' },
+                { label: 'Squat', name: 'Squat' },
+                { label: 'Deadlift', name: 'Deadlift' }
             ];
         }
         return [];
@@ -139,21 +184,7 @@ function InputForm() {
     return (
         <div style={responsiveStyles.container}>
             <form onSubmit={handleSubmit} style={responsiveStyles.form}>
-                {/* ...existing form code... */}
-                <label htmlFor="cluster-program" style={{ display: 'block', marginBottom: 8 }}>
-                    Cluster:
-                </label>
-                <select
-                    id="cluster-program"
-                    value={cluster}
-                    onChange={handleClusterChange}
-                    style={{ width: '100%', padding: 8, marginBottom: 12 }}
-                    required
-                >
-                    <option value="" disabled>Select a cluster</option>
-                    <option value="Standard">Standard</option>
-                    <option value="Grunt">Grunt</option>
-                </select>
+                {/* Strength Program at the top */}
                 <label htmlFor="strength-program" style={{ display: 'block', marginBottom: 8 }}>
                     Strength Program:
                 </label>
@@ -169,6 +200,22 @@ function InputForm() {
                     <option value="Zulu">Zulu</option>
                     <option value="Fighter">Fighter</option>
                     <option value="FighterIA">Fighter I/A (Bangkok)</option>
+                </select>
+                {/* Cluster dropdown dependent on strength program */}
+                <label htmlFor="cluster-program" style={{ display: 'block', marginBottom: 8 }}>
+                    Cluster:
+                </label>
+                <select
+                    id="cluster-program"
+                    value={cluster}
+                    onChange={handleClusterChange}
+                    style={{ width: '100%', padding: 8, marginBottom: 12 }}
+                    required
+                >
+                    <option value="" disabled>Select a cluster</option>
+                    {getClusterOptions().map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                 </select>
                 <label htmlFor="conditioning-program" style={{ display: 'block', marginBottom: 8 }}>
                     Conditioning Program:
